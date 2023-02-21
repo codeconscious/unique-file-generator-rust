@@ -1,8 +1,22 @@
-use std::env;
+use clap::Parser;
+
+/// Simple program to greet a person
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+   /// Name of the person to greet
+   #[arg(short, long)]
+   name: String,
+
+   /// Number of times to greet
+   #[arg(short, long, default_value_t = 1)]
+   count: u8,
+}
 
 fn main() {
-    println!("こんにちは、世界。");
+   let args = Args::parse();
 
-    let args: Vec<String> = env::args().collect();
-    dbg!(args);
+   for _ in 0..args.count {
+       println!("Hello {}!", args.name)
+   }
 }
