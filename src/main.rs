@@ -25,7 +25,7 @@ fn main() {
                 .long("size")
                 .value_name("SIZE_IN_BYTES")
                 .visible_alias("bytes")
-                .help("The size of files to generate"),
+                .help("The size in bytes of files to generate"),
         )
         .arg(
             Arg::new("prefix")
@@ -53,37 +53,51 @@ fn main() {
         )
         .get_matches();
 
-    let requested_count = matches.get_one::<String>("count").unwrap();
-    match requested_count.parse::<u32>() {
-        Ok(count) => println!("Will generate {} file(s).", count),
-        Err(_) => println!("\"{}\" is not a valid number!", requested_count),
-    };
-
-    let size_str = matches.get_one::<String>("size");
-    match size_str {
-        None => println!("No file size was specfied."),
-        Some(s) => match s.parse::<u32>() {
-            Ok(n) => println!("Files will be {} bytes.", n),
-            Err(_) => println!("\"{}\" is not a valid number!", s),
-        },
-    }
-
+    let count = matches.get_one::<String>("count").unwrap();
+    let size = matches.get_one::<String>("size");
     let prefix = matches.get_one::<String>("prefix");
-    match prefix {
-        None => println!("No prefixes will be prepended."),
-        Some(s) => println!("Filenames will be prepended with \"{}\".", s),
-    }
-
     let extension = matches.get_one::<String>("ext");
-    match extension {
-        None => println!("No extensions will be appended."),
-        Some(s) => println!("Files will be given the extension \"{}\".", s),
-    }
+    let requested_directory = matches.get_one::<String>("dir").unwrap();
 
-    let requested_directory = matches.get_one::<String>("dir");
-    let directory = match requested_directory {
-        None => "output",
-        Some(s) => s,
-    };
-    println!("Files will be saved to subdirectory \"{}\".", directory);
+    let _arguments = Arguments::new(count, size, prefix, extension, requested_directory);
+}
+
+#[allow(dead_code)]
+struct Arguments<'a> {
+    count: u32,
+    size: Option<u32>,
+    prefix: Option<&'a String>,
+    extension: Option<&'a String>,
+    subdirectory: &'a String,
+}
+
+impl<'a> Arguments<'a> {
+    fn new(
+        count: &String,
+        size: Option<&String>,
+        prefix: Option<&'a String>,
+        extension: Option<&'a String>,
+        subdirectory: &'a String,
+    ) -> Result<Self, &'a str> {
+        let parsed_count = match count.parse::<u32>() {
+            Ok(n) => n,
+            Err(_) => return Err("\"{count}\" is not a valid number!"),
+        };
+
+        let parsed_size = match size {
+            None => None,
+            Some(s) => match s.parse::<u32>() {
+                Ok(n) => Some(n),
+                Err(_) => return Err("\"{s}\" is not a valid number!"),
+            },
+        };
+
+        Ok(Arguments {
+            count: parsed_count,
+            size: parsed_size,
+            prefix,
+            extension,
+            subdirectory,
+        })
+    }
 }
