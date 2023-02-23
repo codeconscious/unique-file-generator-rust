@@ -1,3 +1,5 @@
+use std::fmt;
+
 /// Parse CLI arguments using the crate Clap.
 pub fn parse_args() -> Result<Arguments, String> {
     use clap::{Arg, Command};
@@ -116,5 +118,38 @@ impl Arguments {
             extension,
             subdirectory,
         })
+    }
+}
+
+impl fmt::Display for Arguments {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let size_phrase = match self.size {
+            Some(s) => s.to_string(),
+            None => "(None)".to_string(),
+        };
+
+        let prefix_phrase = match &self.prefix {
+            Some(p) => p,
+            None => "(None)",
+        };
+
+        let extension_phrase = match &self.extension {
+            Some(e) => e,
+            None => "(None)",
+        };
+
+        // TODO: Find a cleaner way to handle this.
+        let mut output = "Count: ".to_owned();
+        output.push_str(&self.count.to_string());
+        output.push_str("\nFile size: ");
+        output.push_str(&size_phrase);
+        output.push_str("\nPrefix: ");
+        output.push_str(&prefix_phrase);
+        output.push_str("\nExtension: ");
+        output.push_str(&extension_phrase);
+        output.push_str("\nOutput subdirectory: ");
+        output.push_str(&self.subdirectory);
+
+        writeln!(f, "{}", output)
     }
 }
