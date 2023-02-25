@@ -153,14 +153,15 @@ impl fmt::Display for Arguments {
 
         let file_label = if self.count == 1 { "file" } else { "files" };
         let mut output = format!(
-            "Count:         {} {}",
+            "{:14} {} {}",
+            "Count:",
             self.count.to_formatted_string(&Locale::en),
             file_label
         );
-        output.push_str(&format!("\nSize:          {}", size_phrase));
-        output.push_str(&format!("\nPrefix:        {}", prefix_phrase));
-        output.push_str(&format!("\nExtension:     {}", extension_phrase));
-        output.push_str(&format!("\nSubdirectory:  {}", self.subdirectory));
+        output.push_str(&format!("\n{:14} {}", "Size:", size_phrase));
+        output.push_str(&format!("\n{:14} {}", "Prefix:", prefix_phrase));
+        output.push_str(&format!("\n{:14} {}", "Extension:", extension_phrase));
+        output.push_str(&format!("\n{:14} {}", "Subdirectory:", self.subdirectory));
 
         writeln!(f, "{}", output)
     }
