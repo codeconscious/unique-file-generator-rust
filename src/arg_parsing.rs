@@ -97,7 +97,12 @@ impl Arguments {
                     n
                 }
             }
-            Err(_) => return Err(format!("\"{}\" is not a valid number!", count)),
+            Err(_) => {
+                return Err(format!(
+                    "\"{}\" is not a valid number for the count.",
+                    count
+                ))
+            }
         };
 
         let parsed_size = match size {
@@ -110,7 +115,7 @@ impl Arguments {
                         Some(n)
                     }
                 }
-                Err(_) => return Err(format!("\"{}\" is not a valid number!", s)),
+                Err(_) => return Err(format!("\"{}\" is not a valid number of bytes.", s)),
             },
         };
 
