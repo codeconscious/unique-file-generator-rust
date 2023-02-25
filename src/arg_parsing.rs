@@ -138,17 +138,11 @@ impl fmt::Display for Arguments {
             None => "(None)",
         };
 
-        // TODO: Find a cleaner way to handle this.
-        let mut output = "Count: ".to_owned();
-        output.push_str(&self.count.to_string());
-        output.push_str("\nFile size: ");
-        output.push_str(&size_phrase);
-        output.push_str("\nPrefix: ");
-        output.push_str(&prefix_phrase);
-        output.push_str("\nExtension: ");
-        output.push_str(&extension_phrase);
-        output.push_str("\nOutput subdirectory: ");
-        output.push_str(&self.subdirectory);
+        let mut output = format!("Count:         {}", self.count);
+        output.push_str(&format!("\nFile size:     {}", size_phrase));
+        output.push_str(&format!("\nPrefix:        {}", prefix_phrase));
+        output.push_str(&format!("\nExtension:     {}", extension_phrase));
+        output.push_str(&format!("\nSubdirectory:  {}", self.subdirectory));
 
         writeln!(f, "{}", output)
     }
