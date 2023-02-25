@@ -1,3 +1,4 @@
+use num_format::{Locale, ToFormattedString};
 use std::fmt;
 
 /// Parse CLI arguments using the crate Clap.
@@ -124,7 +125,7 @@ impl Arguments {
 impl fmt::Display for Arguments {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let size_phrase = match self.size {
-            Some(s) => s.to_string(),
+            Some(s) => s.to_formatted_string(&Locale::en),
             None => "(None)".to_string(),
         };
 
@@ -138,7 +139,10 @@ impl fmt::Display for Arguments {
             None => "(None)",
         };
 
-        let mut output = format!("Count:         {}", self.count);
+        let mut output = format!(
+            "Count:         {}",
+            self.count.to_formatted_string(&Locale::en)
+        );
         output.push_str(&format!("\nFile size:     {}", size_phrase));
         output.push_str(&format!("\nPrefix:        {}", prefix_phrase));
         output.push_str(&format!("\nExtension:     {}", extension_phrase));
