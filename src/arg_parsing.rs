@@ -5,6 +5,7 @@ use std::fmt;
 pub fn parse_args() -> Result<Arguments, String> {
     use clap::{Arg, Command};
 
+    let default_output_subdirectory = "output";
     let matches = Command::new("Unique File Generator")
         .version("0.1.0")
         .author("CodeConscious (http://www.github.com/codeconscious/unique-file-generator-rust)")
@@ -43,7 +44,7 @@ pub fn parse_args() -> Result<Arguments, String> {
                 .short('e')
                 .long("extension")
                 .value_name("FILE_EXTENSION")
-                .help("File extension, with optional opening period"),
+                .help("File extension (with no opening period)"),
         )
         .arg(
             Arg::new("dir")
@@ -51,7 +52,8 @@ pub fn parse_args() -> Result<Arguments, String> {
                 .long("directory")
                 .short('d')
                 .value_name("DIRECTORY_NAME")
-                .help("The output subdirectory, which will be created if needed (Defaults to \"output\")"),
+                .default_value(default_output_subdirectory)
+                .help("The output subdirectory, which will be created if needed (Defaults to \"{default_output_subdirectory}\")"),
         )
         .get_matches();
 
@@ -90,12 +92,12 @@ impl Arguments {
         let parsed_count = match count.parse::<u32>() {
             Ok(n) => {
                 if n == 0 {
-                    return Err("The count must be greater than 0.".to_string());
+                    return Err("The file count must be greater than 0.".to_string());
                 } else {
                     n
                 }
             }
-            Err(_) => return Err("\"{count}\" is not a valid number!".to_string()),
+            Err(_) => return Err(format!("\"{}\" is not a valid number!", count)),
         };
 
         let parsed_size = match size {
@@ -108,7 +110,7 @@ impl Arguments {
                         Some(n)
                     }
                 }
-                Err(_) => return Err("\"{s}\" is not a valid number!".to_string()),
+                Err(_) => return Err(format!("\"{}\" is not a valid number!", s)),
             },
         };
 
@@ -124,26 +126,33 @@ impl Arguments {
 
 impl fmt::Display for Arguments {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let unspecified_text = "(Unspecified)";
+
         let size_phrase = match self.size {
-            Some(s) => s.to_formatted_string(&Locale::en),
-            None => "(None)".to_string(),
+            Some(s) => {
+                let byte_label = if s == 1 { " byte" } else { " bytes" };
+                s.to_formatted_string(&Locale::en) + byte_label
+            }
+            None => unspecified_text.to_string(),
         };
 
         let prefix_phrase = match &self.prefix {
             Some(p) => p,
-            None => "(None)",
+            None => unspecified_text,
         };
 
         let extension_phrase = match &self.extension {
             Some(e) => e,
-            None => "(None)",
+            None => unspecified_text,
         };
 
+        let file_label = if self.count == 1 { "file" } else { "files" };
         let mut output = format!(
-            "Count:         {}",
-            self.count.to_formatted_string(&Locale::en)
+            "Count:         {} {}",
+            self.count.to_formatted_string(&Locale::en),
+            file_label
         );
-        output.push_str(&format!("\nFile size:     {}", size_phrase));
+        output.push_str(&format!("\nSize:          {}", size_phrase));
         output.push_str(&format!("\nPrefix:        {}", prefix_phrase));
         output.push_str(&format!("\nExtension:     {}", extension_phrase));
         output.push_str(&format!("\nSubdirectory:  {}", self.subdirectory));
