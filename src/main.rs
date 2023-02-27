@@ -1,4 +1,5 @@
 mod arg_parsing;
+mod generate_files;
 mod random_strings;
 
 use arg_parsing::parse_args;
@@ -24,8 +25,14 @@ fn main() {
             Some(s) => random_alphanumeric_string(s),
             None => filename_base,
         };
-        println!("{}", i);
-        println!("- Full filename: {}", filename);
-        println!("- Body contents: {}", file_body);
+        dbg!("{}", i);
+        dbg!("- Full filename: {}", &filename);
+        dbg!("- Body contents: {}", &file_body);
+
+        let write_result = generate_files::create_file(filename.clone(), file_body, safe_args.subdirectory.clone());
+        match write_result {
+            Ok(_) => println!("Wrote file \"{}\" successfully.", filename),
+            Err(e) => println!("{}", e.red())
+        }
     }
 }
