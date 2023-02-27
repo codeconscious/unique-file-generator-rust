@@ -70,15 +70,15 @@ pub fn parse_args() -> Result<Arguments, String> {
 #[derive(Debug)]
 pub struct Arguments {
     /// The number of files to create.
-    count: u32,
+    pub count: usize,
     /// The size of each file in bytes.
-    size: Option<u32>,
+    pub size: Option<usize>,
     /// Text that should be prepended to the filename.
     prefix: Option<String>,
     /// The extension of each file.
     extension: Option<String>,
     /// The subdirectory into which the files should be created.
-    subdirectory: String,
+    pub subdirectory: String,
 }
 
 impl Arguments {
@@ -89,7 +89,7 @@ impl Arguments {
         extension: Option<String>,
         subdirectory: String,
     ) -> Result<Self, String> {
-        let parsed_count = match count.parse::<u32>() {
+        let parsed_count = match count.parse::<usize>() {
             Ok(n) => {
                 if n == 0 {
                     return Err("The file count must be greater than 0.".to_string());
@@ -107,7 +107,7 @@ impl Arguments {
 
         let parsed_size = match size {
             None => None,
-            Some(s) => match s.parse::<u32>() {
+            Some(s) => match s.parse::<usize>() {
                 Ok(n) => {
                     if n == 0 {
                         return Err("The size must be greater than 0.".to_string());
@@ -126,6 +126,25 @@ impl Arguments {
             extension,
             subdirectory,
         })
+    }
+
+    pub fn full_filename(&self, base: &str) -> String {
+        let prefix = match &self.prefix {
+            Some(p) => p.to_owned(),
+            None => "".to_owned(),
+        };
+
+        match &self.extension {
+            Some(ext) => {
+                let sanitized_extension = if ext.starts_with(".") {
+                    ext[1..].to_owned()
+                } else {
+                    ext.to_owned()
+                };
+                prefix + base + "." + sanitized_extension.as_ref()
+            }
+            None => prefix + base,
+        }
     }
 }
 
