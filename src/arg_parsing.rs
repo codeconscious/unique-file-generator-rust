@@ -135,7 +135,14 @@ impl Arguments {
         };
 
         match &self.extension {
-            Some(ext) => prefix + base + "." + ext,
+            Some(ext) => {
+                let sanitized_extension = if ext.starts_with(".") {
+                    ext[1..].to_owned()
+                } else {
+                    ext.to_owned()
+                };
+                prefix + base + "." + sanitized_extension.as_ref()
+            }
             None => prefix + base,
         }
     }
