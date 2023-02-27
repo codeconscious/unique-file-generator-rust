@@ -25,9 +25,9 @@ fn main() {
             Some(s) => random_alphanumeric_string(s),
             None => filename_base,
         };
-        dbg!("{}", i);
-        dbg!("- Full filename: {}", &filename);
-        dbg!("- Body contents: {}", &file_body);
+        // dbg!("{}", i);
+        // dbg!("- Full filename: {}", &filename);
+        // dbg!("- Body contents: {}", &file_body);
 
         let write_result = generate_files::create_file(filename.clone(), file_body, safe_args.subdirectory.clone());
         match write_result {
