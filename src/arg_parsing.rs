@@ -5,7 +5,7 @@ use std::fmt;
 pub fn parse_args() -> Result<Arguments, String> {
     use clap::{Arg, Command};
 
-    let default_output_subdirectory = "output";
+    let default_output_subdirectory = "generated_files";
     let matches = Command::new("Unique File Generator")
         .version("0.1.0")
         .author("CodeConscious (http://www.github.com/codeconscious/unique-file-generator-rust)")
@@ -128,6 +128,8 @@ impl Arguments {
         })
     }
 
+    /// Prepends a specified prefix, if any, and appends a specified
+    /// extension, if any, converting a base filename into a full one.
     pub fn full_filename(&self, base: &str) -> String {
         let prefix = match &self.prefix {
             Some(p) => p.to_owned(),
