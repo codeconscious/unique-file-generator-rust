@@ -1,7 +1,12 @@
 [package]
 name = "unique-file-generator-rust"
-version = "0.1.0"
+version = "0.7.0"
 edition = "2021"
+authors = ["CodeConscious"]
+description = "Generate an arbitrary number of files that are named randomly and contain random content."
+homepage = "https://github.com/codeconscious/unique-file-generator-rust/"
+repository = "https://github.com/codeconscious/unique-file-generator-rust/"
+categories = ["command-line-utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
