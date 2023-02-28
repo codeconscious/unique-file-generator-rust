@@ -1,6 +1,6 @@
 [package]
 name = "unique-file-generator-rust"
-version = "1.0.0"
+version = "0.7.0"
 edition = "2021"
 authors = ["CodeConscious"]
 description = "Generate an arbitrary number of files that are named randomly and contain random content."
