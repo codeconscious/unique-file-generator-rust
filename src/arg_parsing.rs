@@ -6,32 +6,41 @@ pub fn parse_args() -> Result<Arguments, String> {
     use clap::{Arg, Command};
 
     let default_output_subdirectory = "generated_files";
+
+    let count_arg_id = "count";
+    let size_arg_id = "size";
+    let prefix_arg_id = "prefix";
+    let extension_arg_id = "extension";
+    let delay_arg_id = "delay";
+    let subdirectory_arg_id = "output_subdirectory";
+
     let matches = Command::new("Unique File Generator")
         .version("0.1.0")
         .author("CodeConscious (http://www.github.com/codeconscious/unique-file-generator-rust)")
         .about(
-            "Quickly and easily create an arbitrary number of unique (by name and content) files.".to_owned() +
-            "\nEach filename contains a random collection of characters." +
-            "\nSupply optional parameters to customize files according to your needs.")
+            "Easily create an arbitrary number of unique (by name and content) files.".to_owned()
+                + "\nEach filename contains a random collection of characters."
+                + "\nSupply optional parameters to customize files according to your needs.",
+        )
         .arg(
-            Arg::new("count")
+            Arg::new(count_arg_id)
                 .required(true) // Not ideal, per documentation
                 .short('c')
                 .long("count")
                 .value_name("FILE_COUNT")
-                .help("The count of files to generate (Required)"),
+                .help("File count (Required)"),
         )
         .arg(
-            Arg::new("size")
+            Arg::new(size_arg_id)
                 .required(false)
                 .short('s')
                 .long("size")
                 .value_name("SIZE_IN_BYTES")
                 .visible_alias("bytes")
-                .help("The size in bytes of files to generate"),
+                .help("Size in bytes of each file"),
         )
         .arg(
-            Arg::new("prefix")
+            Arg::new(prefix_arg_id)
                 .required(false)
                 .short('p')
                 .long("prefix")
@@ -39,31 +48,46 @@ pub fn parse_args() -> Result<Arguments, String> {
                 .help("Desired filename prefix"),
         )
         .arg(
-            Arg::new("ext")
+            Arg::new(extension_arg_id)
                 .required(false)
                 .short('e')
                 .long("extension")
                 .value_name("FILE_EXTENSION")
-                .help("File extension (with no opening period)"),
+                .help("File extension (Opening period is optional)"),
         )
         .arg(
-            Arg::new("dir")
+            Arg::new(delay_arg_id)
                 .required(false)
-                .long("directory")
                 .short('d')
-                .value_name("DIRECTORY_NAME")
+                .long("delay")
+                .value_name("DELAY_IN_MS")
+                .default_value("0")
+                .help("Number of milliseconds to sleep between each file"),
+        )
+        .arg(
+            Arg::new(subdirectory_arg_id)
+                .required(false)
+                .long("output_directory")
+                .short('o')
+                .value_name("SUBDIRECTORY_NAME")
                 .default_value(default_output_subdirectory)
-                .help("The output subdirectory, which will be created if needed (Defaults to \"{default_output_subdirectory}\")"),
+                .help("The output subdirectory, which will be created if needed"),
         )
         .get_matches();
 
-    let count = matches.get_one::<String>("count").unwrap().to_owned();
-    let size = matches.get_one::<String>("size").map(String::from);
-    let prefix = matches.get_one::<String>("prefix").map(String::from);
-    let extension = matches.get_one::<String>("ext").map(String::from);
-    let subdirectory = matches.get_one::<String>("dir").unwrap().to_owned();
+    let count = matches.get_one::<String>(count_arg_id).unwrap().to_owned();
+    let size = matches.get_one::<String>(size_arg_id).map(String::from);
+    let prefix = matches.get_one::<String>(prefix_arg_id).map(String::from);
+    let extension = matches
+        .get_one::<String>(extension_arg_id)
+        .map(String::from);
+    let subdirectory = matches
+        .get_one::<String>(subdirectory_arg_id)
+        .unwrap()
+        .to_owned();
+    let delay = matches.get_one::<String>(delay_arg_id).map(String::from);
 
-    Arguments::new(count, size, prefix, extension, subdirectory)
+    Arguments::new(count, size, prefix, extension, subdirectory, delay)
 }
 
 #[allow(dead_code)]
@@ -73,12 +97,14 @@ pub struct Arguments {
     pub count: usize,
     /// The size of each file in bytes.
     pub size: Option<usize>,
+    /// The subdirectory into which the files should be created.
+    pub subdirectory: String,
     /// Text that should be prepended to the filename.
     prefix: Option<String>,
     /// The extension of each file.
     extension: Option<String>,
-    /// The subdirectory into which the files should be created.
-    pub subdirectory: String,
+    /// The durations, in milliseconds, to sleep between each file's creation.
+    pub delay: u64,
 }
 
 impl Arguments {
@@ -88,6 +114,7 @@ impl Arguments {
         prefix: Option<String>,
         extension: Option<String>,
         subdirectory: String,
+        delay: Option<String>,
     ) -> Result<Self, String> {
         let parsed_count = match count.parse::<usize>() {
             Ok(n) => {
@@ -119,12 +146,21 @@ impl Arguments {
             },
         };
 
+        let delay = match delay {
+            None => 0,
+            Some(s) => match s.parse::<u64>() {
+                Ok(n) => n,
+                Err(_) => return Err(format!("\"{}\" is not a valid number of milliseconds.", s)),
+            },
+        };
+
         Ok(Arguments {
             count: parsed_count,
             size: parsed_size,
             prefix,
             extension,
             subdirectory,
+            delay,
         })
     }
 

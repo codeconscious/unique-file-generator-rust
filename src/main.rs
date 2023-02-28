@@ -26,7 +26,7 @@ fn main() {
     for i in 0..safe_args.count {
         let new = min(i, safe_args.count) as u64;
         progress_bar.set_position(new);
-        thread::sleep(Duration::from_millis(500)); // TODO: Remove once `sleep` is added.
+        thread::sleep(Duration::from_millis(safe_args.delay));
 
         let filename_base = random_alphanumeric_string(20);
         let filename = safe_args.full_filename(&filename_base);
