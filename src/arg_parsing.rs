@@ -90,7 +90,6 @@ pub fn parse_args() -> Result<Arguments, String> {
     Arguments::new(count, size, prefix, extension, subdirectory, delay)
 }
 
-#[allow(dead_code)]
 #[derive(Debug)]
 pub struct Arguments {
     /// The number of files to create.
