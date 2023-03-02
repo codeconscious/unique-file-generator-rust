@@ -1,6 +1,6 @@
 [package]
 name = "unique-file-generator-rust"
-version = "0.7.0"
+version = "0.7.1"
 edition = "2021"
 authors = ["CodeConscious"]
 description = "Generate an arbitrary number of files that are named randomly and contain random content."
@@ -16,3 +16,7 @@ num-format = "0.4.4"
 colored = "2"
 rand = "0.8.5"
 indicatif = "0.17.3"
+
+[profile.release]
+opt-level = "z"  # Optimize for a smaller size.
+strip = true  # Automatically strip symbols from the binary.
