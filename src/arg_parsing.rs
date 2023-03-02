@@ -163,6 +163,13 @@ impl Arguments {
         })
     }
 
+    pub fn expected_operation_size(&self, default_file_size_bytes: usize) -> usize {
+        match self.size {
+            Some(s) => self.count * s,
+            None => self.count * default_file_size_bytes,
+        }
+    }
+
     /// Prepends a specified prefix, if any, and appends a specified
     /// extension, if any, converting a base filename into a full one.
     pub fn full_filename(&self, base: &str) -> String {

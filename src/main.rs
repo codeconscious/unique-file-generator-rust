@@ -4,6 +4,7 @@ mod random_strings;
 
 use arg_parsing::{parse_args, Arguments};
 use colored::*;
+use generate_files::verify_continue;
 use indicatif::{ProgressBar, ProgressState, ProgressStyle};
 use random_strings::random_alphanumeric_string;
 use std::thread;
@@ -21,8 +22,13 @@ fn main() {
     };
 
     let safe_args = args.unwrap();
-    let progress_bar = prepare_progress_bar(&safe_args);
 
+    if verify_continue(&safe_args) == false {
+        println!("Operation cancelled!");
+        return;
+    }
+
+    let progress_bar = prepare_progress_bar(&safe_args);
     for i in 0..safe_args.count {
         let new = min(i, safe_args.count) as u64;
         progress_bar.set_position(new);
