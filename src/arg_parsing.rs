@@ -115,7 +115,7 @@ impl Arguments {
         subdirectory: String,
         delay: Option<String>,
     ) -> Result<Self, String> {
-        let parsed_count = match count.parse::<usize>() {
+        let parsed_count = match count.replace("_", "").parse::<usize>() {
             Ok(n) => {
                 if n == 0 {
                     return Err("The file count must be greater than 0.".to_string());
@@ -133,7 +133,7 @@ impl Arguments {
 
         let parsed_size = match size {
             None => None,
-            Some(s) => match s.parse::<usize>() {
+            Some(s) => match s.replace("_", "").parse::<usize>() {
                 Ok(n) => {
                     if n == 0 {
                         return Err("The size must be greater than 0.".to_string());
@@ -163,10 +163,20 @@ impl Arguments {
         })
     }
 
-    pub fn expected_operation_size(&self, default_file_size_bytes: usize) -> usize {
-        match self.size {
+    pub fn expected_operation_size(&self, default_file_size_bytes: usize) -> String {
+        let size = match self.size {
             Some(s) => self.count * s,
             None => self.count * default_file_size_bytes,
+        };
+
+        if size < 1_000 {
+            size.to_formatted_string(&Locale::en) + " B"
+        } else if size < 10_000_000 {
+            (size / 1000).to_formatted_string(&Locale::en) + " KB"
+        } else if size < 1_000_000_000 {
+            (size / 1_000_000).to_formatted_string(&Locale::en) + " MB"
+        } else {
+            (size / 1_000_000_000).to_formatted_string(&Locale::en) + " GB"
         }
     }
 
