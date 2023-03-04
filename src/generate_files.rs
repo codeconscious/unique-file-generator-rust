@@ -6,7 +6,7 @@ use std::path::Path;
 
 use crate::arg_parsing::Arguments;
 
-pub fn verify_continue(args: &Arguments) -> bool {
+pub fn should_continue(args: &Arguments) -> bool {
     println!(
         "This operation will take approximately {} of space on your drive.",
         args.expected_operation_size(20)
@@ -36,21 +36,19 @@ pub fn create_file(filename: String, content: String, subfolder: String) -> std:
     prepare_subdirectory(&subfolder)?;
 
     let path = Path::new(".").join(subfolder).join(filename);
-    let mut file = File::create(&path).expect(
-        format!(
+    let mut file = File::create(&path).unwrap_or_else(|_| {
+        panic!(
             "Error encountered while creating file \"{}\"!",
             path.to_string_lossy()
         )
-        .as_str(),
-    );
+    });
 
-    file.write_all(content.as_bytes()).expect(
-        format!(
+    file.write_all(content.as_bytes()).unwrap_or_else(|_| {
+        panic!(
             "Error while writing content to file \"{}\"!",
             path.to_string_lossy()
         )
-        .as_str(),
-    );
+    });
     Ok(())
 }
 
