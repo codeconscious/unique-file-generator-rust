@@ -115,7 +115,7 @@ impl Arguments {
         subdirectory: String,
         delay: Option<String>,
     ) -> Result<Self, String> {
-        let parsed_count = match count.replace("_", "").replace(",", "").parse::<usize>() {
+        let parsed_count = match count.replace(['_', ','], "").parse::<usize>() {
             Ok(n) => {
                 if n == 0 {
                     return Err("The file count must be greater than 0.".to_string());
@@ -123,17 +123,12 @@ impl Arguments {
                     n
                 }
             }
-            Err(_) => {
-                return Err(format!(
-                    "\"{}\" is not a valid number for the count.",
-                    count
-                ))
-            }
+            Err(_) => return Err(format!("\"{count}\" is not a valid number for the count.")),
         };
 
         let parsed_size = match size {
             None => None,
-            Some(s) => match s.replace("_", "").replace(",", "").parse::<usize>() {
+            Some(s) => match s.replace(['_', ','], "").parse::<usize>() {
                 Ok(n) => {
                     if n == 0 {
                         return Err("The size must be greater than 0.".to_string());
@@ -141,15 +136,15 @@ impl Arguments {
                         Some(n)
                     }
                 }
-                Err(_) => return Err(format!("\"{}\" is not a valid number of bytes.", s)),
+                Err(_) => return Err(format!("\"{s}\" is not a valid number of bytes.")),
             },
         };
 
         let delay = match delay {
             None => 0,
-            Some(s) => match s.parse::<u64>() {
+            Some(s) => match s.replace(['_', ','], "").parse::<u64>() {
                 Ok(n) => n,
-                Err(_) => return Err(format!("\"{}\" is not a valid number of milliseconds.", s)),
+                Err(_) => return Err(format!("\"{s}\" is not a valid number of milliseconds.")),
             },
         };
 
@@ -191,14 +186,7 @@ impl Arguments {
         };
 
         match &self.extension {
-            Some(ext) => {
-                let sanitized_extension = if ext.starts_with(".") {
-                    ext[1..].to_owned()
-                } else {
-                    ext.to_owned()
-                };
-                prefix + base + "." + sanitized_extension.as_ref()
-            }
+            Some(ext) => prefix + base + "." + ext.strip_prefix('.').unwrap(),
             None => prefix + base,
         }
     }
@@ -238,6 +226,6 @@ impl fmt::Display for Arguments {
         output.push_str(&format!("\n{:14} {}", "Extension:", extension_phrase));
         output.push_str(&format!("\n{:14} {}", "Subdirectory:", self.subdirectory));
 
-        writeln!(f, "{}", output)
+        writeln!(f, "{output}")
     }
 }

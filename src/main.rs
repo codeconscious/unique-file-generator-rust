@@ -4,7 +4,7 @@ mod random_strings;
 
 use arg_parsing::{parse_args, Arguments};
 use colored::*;
-use generate_files::verify_continue;
+use generate_files::should_continue;
 use indicatif::{ProgressBar, ProgressState, ProgressStyle};
 use random_strings::random_alphanumeric_string;
 use std::thread;
@@ -14,7 +14,7 @@ use std::{cmp::min, fmt::Write};
 fn main() {
     let args = parse_args();
     match &args {
-        Ok(a) => println!("{}", a),
+        Ok(a) => println!("{a}"),
         Err(e) => {
             println!("{}", e.red());
             return;
@@ -23,7 +23,7 @@ fn main() {
 
     let safe_args = args.unwrap();
 
-    if verify_continue(&safe_args) == false {
+    if !should_continue(&safe_args) {
         println!("Operation cancelled!");
         return;
     }
