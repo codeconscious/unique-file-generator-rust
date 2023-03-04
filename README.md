@@ -16,9 +16,10 @@ Each argument is optional. You must supply at least one value for each argument 
 
 Flag | Description
 ---- | :----
+-c | Count of files. Using `_` and `,` is permitted.
 -p | Filename prefix.
 -e | Extension of the generated files. The opening period is optional. If not specified, no extension is added.
--s | Desired size of each file in bytes. If specified, files will be populated with random alphanumeric characters; otherwise, each file will only contain its own name.
+-s | Desired size of each file in bytes. If specified, files will be populated with random alphanumeric characters; otherwise, each file will only contain its own name. Using `_` and `,` is permitted.
 -o | The output subdirectory, which will be created, if needed. Otherwise, a default is used.
 -d | Delay in milliseconds to be applied between each file's creation. Defaults to 0 if unspecified.
 -h | See the instructions.

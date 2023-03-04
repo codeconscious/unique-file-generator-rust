@@ -115,7 +115,7 @@ impl Arguments {
         subdirectory: String,
         delay: Option<String>,
     ) -> Result<Self, String> {
-        let parsed_count = match count.replace("_", "").parse::<usize>() {
+        let parsed_count = match count.replace("_", "").replace(",", "").parse::<usize>() {
             Ok(n) => {
                 if n == 0 {
                     return Err("The file count must be greater than 0.".to_string());
@@ -133,7 +133,7 @@ impl Arguments {
 
         let parsed_size = match size {
             None => None,
-            Some(s) => match s.replace("_", "").parse::<usize>() {
+            Some(s) => match s.replace("_", "").replace(",", "").parse::<usize>() {
                 Ok(n) => {
                     if n == 0 {
                         return Err("The size must be greater than 0.".to_string());
@@ -169,14 +169,16 @@ impl Arguments {
             None => self.count * default_file_size_bytes,
         };
 
+        let locale = &Locale::en;
+
         if size < 1_000 {
-            size.to_formatted_string(&Locale::en) + " B"
+            size.to_formatted_string(locale) + " B"
         } else if size < 10_000_000 {
-            (size / 1000).to_formatted_string(&Locale::en) + " KB"
+            (size / 1000).to_formatted_string(locale) + " KB"
         } else if size < 1_000_000_000 {
-            (size / 1_000_000).to_formatted_string(&Locale::en) + " MB"
+            (size / 1_000_000).to_formatted_string(locale) + " MB"
         } else {
-            (size / 1_000_000_000).to_formatted_string(&Locale::en) + " GB"
+            (size / 1_000_000_000).to_formatted_string(locale) + " GB"
         }
     }
 
