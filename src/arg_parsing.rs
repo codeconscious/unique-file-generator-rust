@@ -186,7 +186,13 @@ impl Arguments {
         };
 
         match &self.extension {
-            Some(ext) => prefix + base + "." + ext.strip_prefix('.').unwrap(),
+            Some(ext) => {
+                let safe_ext = match ext.strip_prefix('.') {
+                    Some(ext_no_period) => ext_no_period,
+                    None => ext,
+                };
+                prefix + base + "." + safe_ext
+            }
             None => prefix + base,
         }
     }
